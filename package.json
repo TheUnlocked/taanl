@@ -1,7 +1,7 @@
 {
   "name": "taanl",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "scripts": {
     "serve": "vue-cli-service serve --fix",
     "build": "vue-cli-service build",
@@ -12,7 +12,6 @@
     "@slack/rtm-api": "^5.0.3",
     "@slack/web-api": "^5.7.0",
     "@types/highlight.js": "^9.12.3",
-    "buffer": "^5.4.3",
     "discord.js": "^11.5.1",
     "highlight.js": "^9.17.1",
     "vue": "^2.6.10",
