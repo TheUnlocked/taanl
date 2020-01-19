@@ -16,8 +16,11 @@ Vue.config.productionTip = false;
 const discordProvider = new TaanlProviderWrapper(new DiscordProvider(discordToken));
 const slackProviders = slackTokens.map(token => new TaanlProviderWrapper(new SlackProvider(token)));
 const eventHooks = new class extends TaanlPostHooks{
-    postMessage(message: Message): void {
+    postNewMessage(message: Message): void {
         app.$root.$emit('new-message', message);
+    }
+    postMessageDeleted(id: string): void {
+        app.$root.$emit('remove-message', id);
     }
 };
 await discordProvider.authorize(eventHooks);
@@ -25,7 +28,7 @@ await Promise.all(slackProviders.map(async x => await x.authorize(eventHooks)));
 
 const servers = [
     ...(await Promise.all(slackProviders.map(async slackProvider => await Promise.all((await slackProvider.getServerIds()).map(x => slackProvider.getServer(x)))))).flat(1),
-    ...await Promise.all((await discordProvider.getServerIds()).map(x => discordProvider.getServer(x)))
+    ...(await Promise.all((await discordProvider.getServerIds()).map(x => discordProvider.getServer(x)))).reverse()
 ];
 
 Vue.use(AsyncComputed);

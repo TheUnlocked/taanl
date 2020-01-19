@@ -42,7 +42,7 @@ export default class DiscordProvider implements TaanlProvider {
                 sender: (await this.getUser(server, message.user))
             };
             this._cachedMessages.push(convertedMessage);
-            postHooks.postMessage(convertedMessage);
+            postHooks.postNewMessage(convertedMessage);
         });
         await this.rtm.start();
     }

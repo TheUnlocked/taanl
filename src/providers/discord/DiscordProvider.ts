@@ -31,7 +31,8 @@ export default class DiscordProvider implements TaanlProvider {
         this.client.on('ready', () => {
             
         });
-        this.client.on('message', async m => postHooks.postMessage(await this.convertMessage(m)));
+        this.client.on('messageDelete', async m => postHooks.postMessageDeleted(m.id));
+        this.client.on('message', async m => postHooks.postNewMessage(await this.convertMessage(m)));
         await this.client.login(this.token);
     }
 
@@ -124,7 +125,7 @@ export default class DiscordProvider implements TaanlProvider {
     }
     async getRecentMessages(channel: Channel): Promise<Message[]> {
         if ((channel as DiscordChannel).__core.permissionsFor(this.client.user)!.has("READ_MESSAGE_HISTORY")) {
-            return Promise.all((await (channel as DiscordChannel).__core.fetchMessages({limit: 40})).map(async x => await this.convertMessage(x)));
+            return Promise.all((await (channel as DiscordChannel).__core.fetchMessages()).map(async x => await this.convertMessage(x)));
         }
         else {
             return [];

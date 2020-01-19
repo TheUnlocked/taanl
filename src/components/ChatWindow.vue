@@ -61,12 +61,16 @@ export default class ChatWindow extends Vue {
 
     mounted() {
         this.$root.$on('new-message', (m: Message) => this.onMessage(m));
+        this.$root.$on('remove-message', (id: string) => this.removeMessage(id));
     }
 
     onMessage(message: Message) {
         if (this.channel && message.channel.server.publicId === this.channel.server.publicId && message.channel.id === this.channel.id) {
             this.messages.push(message);
         }
+    }
+    removeMessage(id: string) {
+        this.messages = this.messages.filter(x => x.id !== id);
     }
 }
 </script>
