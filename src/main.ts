@@ -24,8 +24,7 @@ await discordProvider.authorize(eventHooks);
 await Promise.all(slackProviders.map(async x => await x.authorize(eventHooks)));
 
 const servers = [
-    ...await Promise.all((await slackProviders[0].getServerIds()).map(x => slackProviders[0].getServer(x))),
-    ...await Promise.all((await slackProviders[1].getServerIds()).map(x => slackProviders[1].getServer(x))),
+    ...(await Promise.all(slackProviders.map(async slackProvider => await Promise.all((await slackProvider.getServerIds()).map(x => slackProvider.getServer(x)))))).flat(1),
     ...await Promise.all((await discordProvider.getServerIds()).map(x => discordProvider.getServer(x)))
 ];
 

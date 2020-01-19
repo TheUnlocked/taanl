@@ -6,7 +6,7 @@ import User from '@/types/User';
 import { WebClient } from '@slack/web-api';
 import { RTMClient } from '@slack/rtm-api';
 import TaanlPostHooks from '../TaanlPostHooks';
-import { InherentRole } from '@/types/Role';
+import { InherentRole, Role } from '@/types/Role';
 import SendMessageContents from '@/types/SendMessageContents';
 import { slackParseStrategy } from './SlackChatParser';
 import { parseMedia } from '@/lib/ChatParser';
@@ -20,6 +20,7 @@ export default class DiscordProvider implements TaanlProvider {
     rtm!: RTMClient;
     
     private _cachedMessages: Message[] = [];
+    private _cachedUsers: (User & {timeFetched: number})[] = [];
 
     constructor(token: string) {
         this.token = token;
@@ -79,8 +80,31 @@ export default class DiscordProvider implements TaanlProvider {
         return (await this.web.users.list() as any).users.map((x: any) => x.id);
     }
     async getUser(server: Server, id: string): Promise<User> {
+        if (id === undefined) {
+            return {
+                bot: true,
+                displayName: {
+                    rawText: "Unidentified Bot",
+                    simpleEffects: ['bold', 'italic']
+                },
+                id: undefined!,
+                inherentRoles: [{name: 'bot'}],
+                name: "Unidentified Bot",
+                roles: [] as Role[]
+            } as User;
+        }
+        const cached = this._cachedUsers.find(x => x.id === id);
+        if (cached) {
+            if (cached.timeFetched + 600 > Date.now()) {
+
+            }
+            else {
+                this._cachedUsers = this._cachedUsers.filter(x => x.timeFetched + 600 > Date.now());
+            }
+            return cached;
+        }
         const userInfo = (await this.web.users.info({user: id}) as any).user;
-        return {
+        const user = {
             bot: userInfo.is_bot,
             displayName: { rawText: userInfo.profile.display_name || userInfo.profile.real_name, simpleEffects: ["bold", {effect: 'color', data: userInfo.color}] },
             id: id,
@@ -88,8 +112,11 @@ export default class DiscordProvider implements TaanlProvider {
             name: userInfo.name,
             roles: [],
             avatar: userInfo.profile.image_original,
-            tagline: userInfo.profile.status_text
-        }
+            tagline: userInfo.profile.status_text,
+            timeFetched: Date.now()
+        } as User & {timeFetched: number};
+        this._cachedUsers.push(user);
+        return user;
     }
     async getMessage(channel: Channel, id: string): Promise<Message> {
         return this._cachedMessages.find(x => x.id === id)!;
