@@ -4,7 +4,7 @@
 ```
 npm install
 ```
-**WARNING:** This project uses modified versions of libraries. If code within libraries produce type errors, those parts must be removed, or `never` or `any` type definitions must be declared for those libraries. None of the erroring code is used in TaaNL, so this should not cause any issues.
+**WARNING:** This project uses modified versions of libraries. These changes are currently undocumented, and will need to be made manually if you build from source. _If running TaaNL in an Electron application, this warning may not apply to you._ 
 
 ### Compiles and hot-reloads for development
 ```
