@@ -54,7 +54,7 @@ export function discordParseStrategy(client: Client, message: Message): ChatPars
                 return {
                     component: {
                         type: 'EmoteRender',
-                        attributes: { src: emoji.url }
+                        attributes: { src: emoji.url, name: emoji.name }
                     }
                 }
             }

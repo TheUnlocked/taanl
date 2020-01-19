@@ -47,14 +47,15 @@ export function slackParseStrategy(web: WebClient): ChatParseStrategy {
             regex: emoteRegex,
             conversion: async x => {
                 const emojiList = (await web.emoji.list() as any).emoji;
-                const emoji = emojiList[x.split(':')[1]];
+                const emojiName = x.split(':')[1];
+                const emoji = emojiList[emojiName];
                 if (!emoji) {
                     return x;
                 }
                 return {
                     component: {
                         type: 'EmoteRender',
-                        attributes: { src: emoji }
+                        attributes: { src: emoji, name: emojiName }
                     }
                 }
             }
